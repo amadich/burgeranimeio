@@ -7,21 +7,20 @@ const Login = (app) => {
     try {
       const { email, pwd } = req.body;
       const user = await UserModel.findOne({ email });
-      console.log(pwd);
+
       if (!user) {
-        return res.json({ message: 'Email not found', ok: 0 });
+        return res.status(404).json({ message: 'Email not found', ok: 0 });
       }
 
       const isPasswordValid = await bcrypt.compare(pwd, user.pwd);
 
       if (!isPasswordValid) {
-        return res.json({ message: 'Incorrect email or password', ok: 0 });
+        return res.status(401).json({ message: 'Incorrect email or password', ok: 0 });
       }
 
-      const token = jwt.sign({ User : user, ok: 1 }, 'shhh');
+      const token = jwt.sign({ User: user, ok: 1 }, process.env.JWT_SECRET);
 
-      const decoded = jwt.verify(token, 'shhh');
-      console.log(decoded);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       res.json({ token, user, ok: 1 });
     } catch (error) {
