@@ -2,13 +2,12 @@ const UserModel = require("../CreateUser");
 const multer = require('multer');
 const path = require('path');
 const jwt = require("jsonwebtoken");
-
-const fs = require("fs");
+const fs = require('fs');
 
 const changeAvatar = (app) => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, 'public/catalog/uploads/avatars/');
+      cb(null, '/tmp');
     },
     filename: function (req, file, cb) {
       const extension = path.extname(file.originalname);
@@ -51,13 +50,19 @@ const changeAvatar = (app) => {
         return res.status(404).json({ error: 'User not found', ok: 0 });
       }
 
+      const destinationDir = 'public/catalog/uploads/avatars/';
+      const newFilePath = path.join(__dirname, '..', destinationDir, uploadedFile.filename);
+
+      // Move the file from /tmp/ to the desired directory
+      fs.renameSync(uploadedFile.path, newFilePath);
+
       user.avatar = uploadedFile.filename;
 
       await user.save();
 
-      const token = jwt.sign({User : user},"shhh");
+      const token = jwt.sign({ User: user }, "shhh");
 
-      res.json({ token , user, message: 'Avatar uploaded successfully', ok: 1 });
+      res.json({ token, user, message: 'Avatar uploaded successfully', ok: 1 });
     } catch (error) {
       console.error('Error uploading avatar:', error);
       res.status(500).json({ error: 'Internal server error', ok: 0 });
