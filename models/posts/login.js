@@ -6,7 +6,8 @@ const Login = (app) => {
   app.post('/signin', async (req, res) => {
     try {
       const { email, pwd } = req.body;
-      const user = await UserModel.findOne({ email });
+      const user = await UserModel.findOne({ email }).maxTimeMS(30000);
+
 
       if (!user) {
         return res.status(404).json({ message: 'Email not found', ok: 0 });
