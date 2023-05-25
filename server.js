@@ -1,10 +1,15 @@
 const express = require("express");
-const app = express();
+const path = require("path");
 const cors = require("cors");
+const app = express();
 const PORT = process.env.PORT || 3001;
-const mongoose = require('./models/c_db.js');
 
-// models
+// Middleware
+app.use(express.json());
+app.use(cors());
+app.use(express.static(path.join(__dirname, "public")));
+
+// API routes
 const UserModel = require("./models/CreateUser.js");
 const Register = require("./models/posts/register.js");
 const Login = require("./models/posts/login.js");
@@ -16,24 +21,22 @@ const addeps = require("./models/posts/addeps.js");
 const geteps = require("./models/gets/geteps.js");
 const changeAvatar = require("./models/posts/changeAvatar.js");
 
-
-app.use(express.json());
-app.use(cors());
-app.use(express.static("public"));
-
-// gets
-
 getanimes(app);
 getseries(app);
 geteps(app);
-// posts
 changeAvatar(app);
-// Animes
 uploadanimeimg(app);
 addeps(app);
 anime(app);
-
-// Users
 Register(app);
-Login(app)
-app.listen(PORT , () => {console.log(`Process Starting Port : ${PORT}`);})
+Login(app);
+
+// React app route
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
