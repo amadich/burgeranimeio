@@ -2,6 +2,9 @@ const UserModel = require("../CreateUser");
 const multer = require('multer');
 const path = require('path');
 const jwt = require("jsonwebtoken");
+
+const fs = require("fs");
+
 const changeAvatar = (app) => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
